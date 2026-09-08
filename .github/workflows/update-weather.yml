@@ -20,12 +20,10 @@ jobs:
       - name: Download weather app
         uses: actions/checkout@v5
 
-      - name: Install Pixlet
+      - name: Download Pixlet
         shell: bash
         run: |
-          sudo apt-get update
-          sudo apt-get install --yes libwebp-dev
-          curl --fail --location --retry 3 \
+          curl --fail --location --retry 4 --retry-all-errors --retry-delay 2 \
             --output pixlet.tar.gz \
             https://github.com/tidbyt/pixlet/releases/download/v0.34.0/pixlet_0.34.0_linux_amd64.tar.gz
           tar --extract --gzip --file pixlet.tar.gz
