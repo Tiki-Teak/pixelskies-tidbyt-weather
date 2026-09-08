@@ -9,7 +9,7 @@ Open-Meteo.
 Author: Greg Worthing
 """
 
-# Build: 2026-09-08-retrowx-v49-new-art-review-preview
+# Build: 2026-09-08-retrowx-v50-new-art-live
 load("encoding/base64.star", "base64")
 load("encoding/json.star", "json")
 load("http.star", "http")
@@ -1126,66 +1126,6 @@ def error_screen():
     )
 
 def main(config):
-    # Review-only preview: five new current-condition scenes followed by two
-    # static forecast pages containing all six new compact icons.
-    sample_current = {
-        "is_day": 1,
-        "weather_code": 0,
-        "temperature_2m": 61,
-        "relative_humidity_2m": 68,
-        "wind_speed_10m": 5,
-        "wind_direction_10m": 90,
-        "wind_gusts_10m": 5,
-        "observed_wind_direction": "E",
-    }
-    sample_daily = {
-        "time": ["2026-09-08", "2026-09-12", "2026-09-13", "2026-09-14"],
-        "weather_code": [0, 0, 0, 0],
-        "temperature_2m_max": [70, 68, 66, 64],
-        "temperature_2m_min": [52, 50, 49, 48],
-        "rain_sum": [0, 0, 0, 0],
-        "showers_sum": [0, 0, 0, 0],
-        "snowfall_sum": [0, 0, 0, 0],
-        "wind_speed_10m_max": [0, 0, 0, 0],
-        "wind_gusts_10m_max": [0, 0, 0, 0],
-    }
-    frames = []
-    for kind in ["mostly_clear", "foggy", "haze", "smoke", "mostly_cloudy"]:
-        screen = current_screen(
-            sample_current,
-            sample_daily,
-            "Fahrenheit",
-            OFF_WHITE,
-            "KT",
-            0,
-            kind,
-            None,
-            False,
-            False,
-        )
-        frames.extend(hold(screen, 15))
-
-    forecast_one = render.Box(width = 64, height = 32, color = BLACK, child = render.Row(children = [
-        forecast_day(sample_daily, "America/Los_Angeles", 1, 21, "Fahrenheit", False, OFF_WHITE, "windy"),
-        forecast_day(sample_daily, "America/Los_Angeles", 2, 21, "Fahrenheit", False, OFF_WHITE, "foggy"),
-        forecast_day(sample_daily, "America/Los_Angeles", 3, 22, "Fahrenheit", False, OFF_WHITE, "haze"),
-    ]))
-    forecast_two = render.Box(width = 64, height = 32, color = BLACK, child = render.Row(children = [
-        forecast_day(sample_daily, "America/Los_Angeles", 1, 21, "Fahrenheit", False, OFF_WHITE, "mostly_clear"),
-        forecast_day(sample_daily, "America/Los_Angeles", 2, 21, "Fahrenheit", False, OFF_WHITE, "smoke"),
-        forecast_day(sample_daily, "America/Los_Angeles", 3, 22, "Fahrenheit", False, OFF_WHITE, "mostly_cloudy"),
-    ]))
-    frames.extend(hold(forecast_one, 35))
-    frames.extend(hold(forecast_two, 35))
-    return render.Root(
-        delay = 100,
-        max_age = 600,
-        show_full_animation = True,
-        child = render.Animation(children = frames),
-    )
-
-    # The live implementation remains below so this preview retains the same
-    # complete, self-contained artwork set as the production file.
     location = json.decode(config.get("location", DEFAULT_LOCATION))
     units = config.get("units", "Fahrenheit")
     unit_parameter = "celsius" if units == "Celsius" else "fahrenheit"
