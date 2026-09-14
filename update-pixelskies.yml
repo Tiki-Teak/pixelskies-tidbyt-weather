@@ -1,4 +1,4 @@
-name: Update Tidbyt weather
+name: Update PixelSkies
 
 on:
   schedule:
@@ -9,7 +9,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: mount-vernon-weather-update
+  group: pixelskies-weather-update
   cancel-in-progress: true
 
 jobs:
@@ -33,7 +33,7 @@ jobs:
         shell: bash
         run: |
           for attempt in 1 2 3 4; do
-            if ./pixlet render mount_vernon_weather.star; then
+            if ./pixlet render pixel_skies.star; then
               exit 0
             fi
             if [ "$attempt" -lt 4 ]; then
@@ -54,4 +54,4 @@ jobs:
             --api-token "$TIDBYT_API_TOKEN" \
             --installation-id mountvernonweather \
             "$TIDBYT_DEVICE_ID" \
-            mount_vernon_weather.webp
+            pixel_skies.webp

@@ -1,7 +1,7 @@
 """
-Applet: RetroWx
+Applet: PixelSkies
 Summary: Atmospheric current weather and a three-day outlook
-Description: RetroWx pairs immersive condition-driven weather scenes with a clear
+Description: PixelSkies pairs handcrafted atmospheric pixel scenes with a clear
   high-contrast current-conditions display and distinctive three-day forecast icons.
 condition icon, current temperature, today's high and low, humidity, wind in
 knots and direction, and a three-day forecast. Weather data is provided by
@@ -9,7 +9,7 @@ Open-Meteo.
 Author: Greg Worthing
 """
 
-# Build: 2026-09-08-retrowx-v51-updated-fog-haze-live
+# Build: 2026-09-14-pixelskies-v1-layered-lighter-forecast-fog
 load("encoding/base64.star", "base64")
 load("encoding/json.star", "json")
 load("http.star", "http")
@@ -28,7 +28,7 @@ USER_FORECAST_SCENES = {
     "wind_breezy": "iVBORw0KGgoAAAANSUhEUgAAABIAAAAQCAIAAACUZLgLAAABE0lEQVR42mNgoCJYGmqQ76SKVRzCYMKqLXr1BTNh7nwndWTBad6ap95+hbAZGRgYhAyCuMRF2flleMS4Lk4pRjb71NuvE/fdZmBgmOajefPbHwibgYGBhU3SildWhp2P59bS2qQrP97euaYTHg4xLzrRbWmogYOOcooW77Fnn6YduYew2qS8C9klsSffqkYXKwWXQLgOOsoQhOYLRjwBk++kaibCNevaFwMxJjNh7ujVFwgHZr6T6jQfTQYGhpySbgh3aZgBsXoYGBjOX38EF4RHAM54gzAgVkFIonQyMDDMXLIDzobrJACQ7YGQcNcSZRVcNbLlTLi0Xb5wGWKPoaYcRANEhAA4f/3RbFS/IdtGJgAAM3hpQkOCl4gAAAAASUVORK5CYII=",
     "windy": "iVBORw0KGgoAAAANSUhEUgAAABIAAAAQCAIAAACUZLgLAAABE0lEQVR42mNgoCJYGmqQ76SKVRzCYMKqLXr1BTNh7nwndWTBad6ap95+hbAZGRgYhAyCuMRF2flleMS4Lk4pRjb71NuvE/fdZmBgmOajefPbHwibgYGBhU3SildWhp2P59bS2qQrP97euaYTHg4xLzrRbWmogYOOcooW77Fnn6YduYew2qS8C9klsSffqkYXKwWXQLgOOsoQhOYLRjwBk++kaibCNevaFwMxJjNh7ujVFwgHZr6T6jQfTQYGhpySbgh3aZgBsXoYGBjOX38EF4RHAM54gzAgVkFIonQyMDDMXLIDzobrJACQ7YGQcNcSZRVcNbLlTLi0Xb5wGWKPoaYcRANEhAA4f/3RbFS/IdtGJgAAM3hpQkOCl4gAAAAASUVORK5CYII=",
     "wind_high": "iVBORw0KGgoAAAANSUhEUgAAABIAAAAQCAIAAACUZLgLAAABE0lEQVR42mNgoCJYGmqQ76SKVRzCYMKqLXr1BTNh7nwndWTBad6ap95+hbAZGRgYhAyCuMRF2flleMS4Lk4pRjb71NuvE/fdZmBgmOajefPbHwibgYGBhU3SildWhp2P59bS2qQrP97euaYTHg4xLzrRbWmogYOOcooW77Fnn6YduYew2qS8C9klsSffqkYXKwWXQLgOOsoQhOYLRjwBk++kaibCNevaFwMxJjNh7ujVFwgHZr6T6jQfTQYGhpySbgh3aZgBsXoYGBjOX38EF4RHAM54gzAgVkFIonQyMDDMXLIDzobrJACQ7YGQcNcSZRVcNbLlTLi0Xb5wGWKPoaYcRANEhAA4f/3RbFS/IdtGJgAAM3hpQkOCl4gAAAAASUVORK5CYII=",
-    "foggy": "iVBORw0KGgoAAAANSUhEUgAAABIAAAAQCAIAAACUZLgLAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAAGYktHRAD/AP8A/6C9p5MAAAAHdElNRQfqCQgCLhnfR61YAAACOElEQVQoz61TTYgSARR+M4471jDurmxqzbYrzuwY2WEVWmg8KISnJMiDDLmnPRWUdAujY0R07LJHJQ/rTZCCRXFhKYbWg9lKEeNU1EpDxarr3+bPzHRQMFxP0Tt9vPd9D9573wP473HxpW4i4/f7h2BUcLvdsiz/zVjL4KQNLEHk+3MNAHieD4fDZrOZJMlyuYwNSY1Gw+fzBYNBQRA4jgOA/aWtYu7jqneV5i3RaLRer2ez2UwmQ1EUAIxkkiRJkmS1WjmOEwTh083U7zdKt679MJXcj6ndF7sEQQBAPp8f8pGpU11O40Nw+KGHLaLiujJBQE9qVh6h+JKqIhoA6PWoTpvSd4rMEtB1v6G9jtY6HszQyLwTZbcmV4qdlFX3FINjMKggigFRa6q2jNIu07PthCiKABCJREYHcDgcOI43m00AWHuFNt+rSBsjFjEDq+EVY/8XSl04I3VKIcctHMedTmcul0MAgGEYu91OEETn0sHR9bdHBYWAORggy9eMlg79WhAUrKdXZjbaTwVBSCaTo016PJ5AIOByuR5IoUatZbLODXRd6PcBoN1SjCsYUMrhjkIy2Lsb/bFLaJpmGGbz60OLbcFwHghltikfP9HfY/d16cJnRVVPn0XOga31pXc3Fj4lUmOXAMC66T5rZOPxOABkk8mD23sA4J/lOQvnXfDKfbkkl2qbtUJhe3zudDodi8VSqRTP80OjXJ3/eSV0Z6dUYVlWFMVEIkGSZLVaLRaL//4cfwDmjOAgTpTX3AAAAABJRU5ErkJggg==",
+    "foggy": "iVBORw0KGgoAAAANSUhEUgAAABIAAAAQCAMAAAAs2N9uAAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAADAUExURQAAAAABASlLQyY7OwEBARIhHVyAawsSEkJgXRQgIHeDiG9+gS9UST9qWaW0t7PAw7fHyrrKzYebn3mHi0hmYo6hp4+jqZSpr5WrsZKnrUpcY0pbYlFlakhfYVp1eWmCim2IkHCMk196gFx2fFBlbDFJSCxDQwcLCxowKjdeUQMGBQ4bGDBWSqe2uLXDxrnIzLjHygYMCixPRoaan5OorpGlq1lyeEpdYypNRHtUNjRbTggNDQ8XFy1RRydAPf///z4E1qIAAAABYktHRD8+YzB1AAAAB3RJTUUH6gkOFDgor8GYqwAAALNJREFUGNONj9kSgjAMRUORgkhEBBRXxBUQF3Ct2/9/lingu+eh6ZzJvTMB+BuFKdVHbfyUxrVy6kaznKbZstBq20TH6bqV8hDR832/1w+CwXAEMJ5YHNGahuEsiuaLJSlgtMSRgb4yiPVGRuMEMUlBNUpUMtuM1jDb2fuD4xxdEyAvuFRYnM4BcfGrKlmGLJJcbxRM7yjEI35WVcarNFwIfH/UGkhlkBSy/Hcfkwgh39p8ATL+EAXbUb+GAAAAAElFTkSuQmCC",
     "haze": "iVBORw0KGgoAAAANSUhEUgAAABMAAAAQCAIAAAB7ptM1AAAAIGNIUk0AAHomAACAhAAA+gAAAIDoAAB1MAAA6mAAADqYAAAXcJy6UTwAAAAGYktHRAD/AP8A/6C9p5MAAAAHdElNRQfqCQgCLhnfR61YAAAB4ElEQVQoz73Rv28SYRgH8O977x2HTa9oLYc5oqbWxA4ktdrBQNKhbg7sHImJgwRW/gAnNkd2Boeu7KyGhaSQWMEQIQeSmOM4auWXV7l7XwcSqrYmTD7T+/z45EmeF/j/Qa6tjo5f/p5u6O9Wkn+xf2GyCrsWkxXZEnc6HUVR2u22eLUtPTxaPFz1nj/0hEp+zuaEyiC0//xtt9v1PC+Xy13KSqUioUHVR57VpLcfQJIpQKnIhh02sS5mtuB+C+69ymQyxWJRlmUCIJlMFgoFx3GUGxJjnAjcMxtevwEONhkA4M4IgLt5/83xh3w+D4BzTgCUy+VwOGxZ1mP51PspAWDj/mKaz2dEWqNbO57dJgIb7L4ulUoAUqkUARCJRJrNpiRJ427Z/fLe/X7BxiaR1oh/Q1gPAvDsNtj0PHSkPX0xnU4VRQEgAqjX6wA0TTsx5sCzvZsfPQE0uOsOPrPZGRt9Fbe2Be1A1fYdx7Esa3EXEYDP5wNgmma1Wk0kEu5gLvCua30C9fEf5+LdA+HWNtH2e73ecDj84z8JIdlsNhqNxuNxwzBCoZBt23e4OemdnvHAeH0HQKvVWgBd1y936roei8UMw6jVaqqqBgKBRS+dTgM4POTLPUu2agiCcLX4C98x0VGx74tLAAAAAElFTkSuQmCC",
     "mostly_clear": "iVBORw0KGgoAAAANSUhEUgAAABIAAAAQCAIAAACUZLgLAAACMUlEQVR42mNgoAQwMjIic1lYmFJTfbFKYQFsrIwejnrJ8SG8PBxXLi0SkrFnYGAIDXbBVMkEoxijQ21DouOv3f8YESDfVRqgIPd5TbbQvZsdKQ5yDAwMJ3fXobgOmXNzVcpXPs4ft5/I+vgLC3D//nbk3P5/f18/d85xltPa+/j2GnRtKkqqs2bFcDy6zi3Jreng/PefHSPj9X+/dzB8ev/n2ce7e96vYLBQ4/qQXDgNop4ZQr3/8G734W/ZXtxK1ix///1gZHrB+O8Kw79v/369/ff/18VLejL/rkdVLmFmZvz/H6ZNUVF+2cy0zhbvZw9fCXG8/c/0nYHxJcO/jww/P/7/+vPvx9+sl56Y17glhLsx/mc7ceYWAwMDCwMDw/efP55c//3+x9bfn/79FfvFyPKFhfXP/z+///9k/vfx9/93fxj+sn09uPfOTcVHDz+gB4mRifGCNn3pK7dOe21+/f6XH3MCw5+/v+9///f694Xrmk+1ORPzpjExMvz7j6RNXl5xaX/Y06t3/Sum/frN+5eB9fi9XwdOXC+6UviSWfDlF6HzvExM3GyljdPRY9A5/9inH9/+/v3/+8+bP3/+3Xz98//fD4er3HEmjqSGbSfufvr/79fvP/+evf/y6euvr59+vv3y692XL7i0MDMwMLBKWskIK4szP3/+nXv3nd+3Pv59/v3P349/LG3tvr5/gT0Nw1msrLxaITPcPRzuvvp9dtNCcU3zk7M8GKgLAKiUCLwpZBfHAAAAAElFTkSuQmCC",
     "smoke": "iVBORw0KGgoAAAANSUhEUgAAABIAAAAQCAIAAACUZLgLAAACJElEQVR42mNgIAswYxVlYWFKTvY5d+4WhFtaWMDLx2NrZnjhynWICBOaBkZGxuT4EE4OtvzcUCEZewYGBm93m0vXrspIiHBw8YiIiGDRdvfKZAZmoYhA+a7SAAW5T2uyhdavKrr15D+fmDIfJzPz/z+SkpJYHLl116c3r6Nf7bluGurDzSEorvn5xP63sWG6MgzfDpy+wcLGwcLKeefuHRRtKxZUqxurch46Y5ARzsntyMT6iYnlnr7Gr5tnmbn4WZW11T59Zli8fBXUL1BLmRn//v2/pTNIw4xT0lCWiUX+//9n//9+vHyR9evj319+cu06+WHa7Bn//6OGZGGW/6olufpOYr8vXWYX/fPwyZtly95eOv/t2rUPttLvf/ziYfz3RU1H7cSpqyjajp++OXPtDxvWp0yv2NZdkfjx7p2mijA/E+vfD18//JRhYf5y5InU00dPrt+8hRKSjIyMPz5ct4m2PPNW4sPTV3LCvOw/P/78zSDELSjIzC0qz6Ms/u/bjz+IeIKzDHW1vv5jD/M2tRZ5+fm7zB8mJmZG1k9/mATefL7Lz7Nzz6Gnb17euvsIXRszM7Obm5uNiREXP5c89ydNA6Yff3gNbauwJiNEdLu6OMnLyVy8cpn1z9f5Wy8+ei6+ZuMLXGkSqk1NTU1TTsTy2W1ZWZmZSzfHMH07cfram0/fCGj7+OrJhRuPhT+97Z00rYH9C4P8y827LjFQHQAArLnYGZIwDQoAAAAASUVORK5CYII=",
@@ -244,7 +244,7 @@ WEATHER_SCENES = {
 WEATHER_SCENES["rainy"] = "iVBORw0KGgoAAAANSUhEUgAAACgAAAAcCAYAAAATFf3WAAAExklEQVR4nMWWW2wUZRiG32929nzo9kDrtkCLpQrLKSYGrlAx1hhCSI0BkxoTTbReaPTCkJAmzSwhMZiGC4QQrZp4iGDaaMB4YULApCCISmqgBwjtlt0CpWx3u7uznT3P50Vd0m5nt6108b2amX/m/Z95v++f+YGHEz3k84uehDTOaU8365iZJEkSmFlYwOORiQAQM8+blJmF7u5uncZYSQHnmDPzA7hLf97YOXLrzulEQvmMmTfn3/coAGcZMzGDiDxg9vDPvQPvhsNyZ+PKCtOWdSuRTsR98VT2O7vdqlit1i+IaIKZiYj4Xx8uBaCYO9jT3SMQ7c0CwJFvduwEZT6RYzJHouEUZ9O0tr66XqfTtRv0IuKK/IIsy68CCEoS8wEPGFSaEEVgplxElL1wxbu73lX2pn98srH38hCmQmFVUO266WQGwYiSqa508LSisNVsei4WjT1vt9u/Z2bBg9LVWJQkSSAi9ccL3hcHfcGvmci5xlWOl7ZvzA77x4XphMr+e1Pw3Q6Qe62LnDajWum0qUaj8dlkMtkP4AaATIn4Zl78WE/fhrAsn5ucDFfXOIXk1g2rRL1OR96xABJplccDIaiZND296XE8WV/NZrMeVrMZJrMpHorI7avrXEdLBSgAgP/uuH3E66se83mZwKLVaqXGhsfgtBsx7PVRNBLF5nUNqCh3sM5gIIPBSCP+e+qVayO2iUCkvff3fnepAEVJkoRx09iV4OT08dW1K96yO6uEodEJgprlTU+sAljFTf99SquMvkE/Wcx6Xr+mBuV2Ey7+9TfHU6rBUV5mKBUg5T4VJ3+5tmtg+O6nE4FgrR5ptamhGu5GFxrqqsCs0tlLQ+i/fostVjNtbKpD7QqnGo4qYt/gyNFD+994HwC6TpzittaWZV0vBABHT17elWThq2gs7hwdHVXDwQlh21NuCEQQKUsNdVVQUhk+91sfJoMhOGxm1WIyqpvWN+nLnGXnEkbsFaPBUMf5ChzcHsJyQooAcHP09rZwLF6pyBEkUwmdIsdwdXA4m0imOZ2Mq6tqq2C22nSpRIqCgRClEjYdAwjJKVQ6nRXbttSEOs5XAAA6zlcsa5IiAPhu+A/DlMZ0TN6VyWTNqsrWu7f9dRabg5RpBcPeJMwmPeLxeNJg0meNRtN1nZ5uGvTCmDIlfwnUDC0HjJbmvKV07Ffb4J2rZqTIFhoPbM6oaZdIWEuqIBiN+oupTOa+o8yeqXSUD3R9/E4EmOm7XHqztZhSLybp3K+OJEmiA+/tiAGIAQgAGC1uIgmSNPfK/te34tC3fxSbbw7cBz+kFoTMG2ACA3v29ghAD5pffi2z74wFnc0KmlzrVhw/3jEFAG63mw94PNx18rSqlV5OhVLMweV05BVDwbQLknedOMX7zlgenHc2K/NMCpW3GGA+3EKQmrvkfDgA2HfGgq4Tp0qypSqmYtv4BdXW2kIHt4c0x5aSHgDk+nFBQK30ctJKUQtyMXAffbh7UZDzTGbDed5+Bp7Pe+cZFerH2dALwbUf/mmeb06z+1EseBegCVdIS/lzFIPL10P14KPQHMC21hbqbFb+LxZNFS1xvnLwS90ItLW2UK5HC61iYKb38v01J9JayVoL479oqR/qfwAGgXe/YMhKEAAAAABJRU5ErkJggg=="
 WEATHER_SCENES["moon"] = CURRENT_ICONS["moon"]
 
-# RetroWx atmospheric scenes: immersive sky/weather slices rather than
+# PixelSkies atmospheric scenes: immersive sky/weather slices rather than
 # standalone icons. Each scene is pre-masked with a soft diagonal edge so it
 # blends naturally into the black information panel.
 WEATHER_SCENES.update({
@@ -908,7 +908,7 @@ def metric_row(label, value, value_color = OFF_WHITE):
     )
 
 def has_active_watch_or_warning(payload):
-    # RetroWx only needs a yes/no signal. NWS event names, severity labels,
+    # PixelSkies only needs a yes/no signal. NWS event names, severity labels,
     # instructions, forecast badges, and takeover behavior are intentionally
     # excluded from the presentation.
     for feature in payload.get("features", []):
@@ -1192,7 +1192,7 @@ def main(config):
         alerts_url,
         headers = {
             "Accept": "application/geo+json",
-            "User-Agent": "RetroWx Tidbyt weather display",
+            "User-Agent": "PixelSkies Tidbyt weather display",
         },
         ttl_seconds = 300,
     )
