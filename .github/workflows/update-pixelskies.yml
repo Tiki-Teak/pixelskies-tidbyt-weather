@@ -52,6 +52,6 @@ jobs:
         run: |
           ./pixlet push \
             --api-token "$TIDBYT_API_TOKEN" \
-            --installation-id mountvernonweather \
+            --installation-id PixelSkies \
             "$TIDBYT_DEVICE_ID" \
             pixel_skies.webp
