@@ -52,6 +52,7 @@ jobs:
         run: |
           ./pixlet push \
             --api-token "$TIDBYT_API_TOKEN" \
+            --background \
             --installation-id PixelSkies \
             "$TIDBYT_DEVICE_ID" \
             pixel_skies.webp
